@@ -23,6 +23,23 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — 补"入口"：references/primer.md 主题导航地图（知识库首次可被意图检索）
+
+**做了什么**
+- 新建 `references/primer.md`（此前 `references/` 为空）：一份**任务导向的阅读地图**，把 23 个 wiki 页按"工程师在做什么"组织成 5 条路径，每条给推荐阅读顺序 + 真实 wiki id：
+  1. MoE 推理优化　2. Attention/Decode　3. 量化优化　4. 新算子开发(AscendC)　5. Triton kernel 开发
+- 附横切概念（算子融合/数据通路/对齐）、其他 kernel 速查、工具用法（query.py / get_page.py / 索引）、覆盖现状表。
+- **链接全部实测**：24 个 id 引用 + 31 个相对链接逐一校验，0 broken（脚本核对，非肉眼）。
+
+**为什么**
+- 之前只能按类型 `query.py` 或点开单页，缺"我在做 MoE decode，从哪开始看"这种按意图导航的入口。23 页正好形成完整图谱，是写 primer 的最佳时机（再多反而难写清）。
+- 同时否掉了两个次优方向：migration 页（只有 3 个 910c PR 且已进 kernel 页，无迁移对比材料，等于复述）、defer 提升（19 bugfix/7 backport 的正确归宿是补进已有 kernel 页的 notes，不该独立成页）。
+
+**结果 / 现状**
+- `validate.py` = **0 errors**（primer 在 references/ 不被 validator 扫，但其引用的 id/链接已单独校验通过）。知识库从"可检索"升级为"可按意图导航"。
+
+---
+
 ### 2026-07-02 — 铺高频 kernel 页（+3 kernel +1 支撑 pattern，wiki 达 23 页）
 
 **做了什么**（按用户指定顺序）
