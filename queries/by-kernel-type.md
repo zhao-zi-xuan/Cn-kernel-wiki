@@ -17,6 +17,10 @@
 - `pr-vllm-ascend-5356`
 - `pr-vllm-ascend-7779`
 
+## embedding (1)
+
+- `kernel-vocab-parallel-embedding`
+
 ## flash-attention (1)
 
 - `pr-vllm-ascend-4625`
@@ -31,8 +35,13 @@
 - `pr-vllm-ascend-4139`
 - `pr-vllm-ascend-4790`
 
-## kv-cache (1)
+## gemv (1)
 
+- `kernel-lora-bgmv`
+
+## kv-cache (2)
+
+- `kernel-transpose-kv-cache-by-block`
 - `pr-vllm-ascend-6366`
 
 ## matmul (6)

@@ -78,6 +78,7 @@ kernel_types:
   - quantization
   - decode
   - prefill
+  - embedding
 
 languages:
   - ascendc            # AscendC (C++-like kernel language)

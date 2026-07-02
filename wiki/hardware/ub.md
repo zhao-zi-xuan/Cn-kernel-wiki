@@ -15,6 +15,7 @@ confidence: source-reported
 related:
   - hw-cube-unit
   - hw-mte
+  - hw-vector-unit
   - kernel-fused-moe
 sources:
   - doc-ascendc-programming-guide

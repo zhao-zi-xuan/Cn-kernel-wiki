@@ -23,6 +23,25 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — 第三步续二：+1 硬件页 +3 kernel 页（wiki 达 9 页）
+
+**做了什么**
+- 词表：`data/tags.yaml` 的 `kernel_types` 新增 `embedding`（vocab 并行 embedding 需要，原词表无合适项）。
+- 新增 `wiki/hardware/vector-unit.md`（`hw-vector-unit`）：AIV 的 element-wise/reduction 角色、与 Cube 的分工、AIC/AIV 并发、element-wise 融合动机。
+- 新增 3 个 kernel 页：
+  - `kernel-transpose-kv-cache-by-block`（#6366）：GQA 异构 TP 下的 KV-cache 转置，一个融合 op 取代 `npu_paged_cache_load + transpose + _npu_reshape_and_cache` 三件套；full-load / general 双路径。芯片 `ascend-910c`（源 PR 指明）。
+  - `kernel-vocab-parallel-embedding`（#796）：`get_masked_input_and_mask` 纯 Vector 掩码 kernel（TP 分片词表的越界 id 掩码 + 局部索引）。
+  - `kernel-lora-bgmv`（#1884）：`bgmv_shrink`/`bgmv_expand` —— LoRA 的 batched gather-GEMV 对。
+- 反向互引：`cube-unit`/`ub` 回引 `vector-unit`，9 页互引更密。
+
+**为什么**
+- 沿"素材齐全的 kernel 优先"继续扩 wiki；补 `vector-unit` 让三大计算/搬运单元（cube/vector/mte+ub）硬件页齐全，作为 kernel 页的公共依赖。
+
+**结果 / 现状**
+- `validate.py` = **0 errors**（32 source / **9 wiki** / 41 ids），索引重生。所有新 kernel 页 `performance_claims` 均定性 `source-reported`（源 PR 无绝对数字），芯片按源 PR 如实标注（910c / davinci / 910b）。
+
+---
+
 ### 2026-07-02 — 上传到 GitHub（独立仓库，不含个人文件）
 
 **做了什么**
@@ -129,7 +148,7 @@
 | 层 | 内容 | 数量 |
 |---|---|---|
 | sources | vllm-ascend PR 页 + 官方文档摘要 | 31 PR + 1 doc |
-| wiki | `hardware/`：cube-unit、ub、mte；`kernels/`：fused-moe（DispatchFFNCombine）、mla-preprocess | 5 页 |
+| wiki | `hardware/`：cube-unit、ub、mte、vector-unit；`kernels/`：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv | 9 页 |
 | candidates | vllm-ascend 账本 | 31 incl / 37 defer / 18 excl |
 | queries | 自动索引 | 6 个（生成物，勿手改） |
 
@@ -138,9 +157,9 @@
 ## 下一步（按 CLAUDE.md 依赖排序）
 
 1. **写 wiki 综合页**（当前重点，素材已充分）：
-   - kernel 页：~~`dispatch_ffn_combine`~~（✅）、~~`mla_preprocess`~~（✅）、`transpose_kv_cache_by_block`（#6366）、LoRA bgmv（#1884）、vocabparallel embedding（#796）。
-   - hardware 页：~~`ub`~~（✅）、~~`mte`~~（✅），待补 `vector-unit / nz-format / pto-isa / l1-buffer`。
-   - technique 页（尚未开张）：`operator-fusion`、`host-tiling`、`double-buffering`、`ub-alignment`、`fine-grained-quantization` —— 这些 tag 已在多页出现，可提炼成独立 technique 页。
+   - kernel 页：~~`dispatch_ffn_combine`~~（✅）、~~`mla_preprocess`~~（✅）、~~`transpose_kv_cache_by_block`~~（✅）、~~LoRA bgmv~~（✅）、~~vocabparallel embedding~~（✅）。下一批候选：GmmSwigluQuantWeightNzTensorList（#3804，nz-format 量化）、l2norm/fused_gdn_gating triton（#4595/#4304）、rope triton（#5918）。
+   - hardware 页：~~`ub`~~（✅）、~~`mte`~~（✅）、~~`vector-unit`~~（✅），待补 `nz-format / pto-isa / l1-buffer / l0c`。
+   - technique 页（尚未开张，建议下一步优先）：`operator-fusion`、`host-tiling`、`double-buffering`、`ub-alignment`、`fine-grained-quantization` —— 这些 tag 已在多页出现，可提炼成独立 technique 页，把散落的概念收敛。
    - 每页带 snippet 级 AscendC/TileLang 代码、靠 `id` 互引 sources、confidence 严格按证据分级。
 2. **gitcode/Gitee 适配器**：CANN 的 `cann-recipes-infer/train` 不在 GitHub，需给 `generate-pr-pages.py` 加 gitcode API 分支。
 3. **artifacts 溯源**（可选）：拉真实 kernel 代码进 `artifacts/`，每 bundle 一个 `PROVENANCE.yaml`。

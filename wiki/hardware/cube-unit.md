@@ -17,6 +17,7 @@ related:
   - kernel-fused-moe
   - hw-ub
   - hw-mte
+  - hw-vector-unit
 sources:
   - doc-ascendc-programming-guide
 aliases:
