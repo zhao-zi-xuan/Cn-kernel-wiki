@@ -23,6 +23,21 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — language 页（只做 2 个：lang-ascendc + lang-triton-ascend，wiki 达 19 页）
+
+**做了什么**
+- 新增 `wiki/languages/ascendc.md`（`lang-ascendc`）：C++ 式 device kernel 语言、两段式 host/device、`GlobalTensor/LocalTensor`、`TQue`（BUFFER_NUM=2 即 double buffer）、`DataCopy/Mmad`+Vector intrinsics，含完整 CopyIn→Compute→CopyOut device kernel snippet。sources：官方文档 + #233/#3226/#6366。
+- 新增 `wiki/languages/triton-ascend.md`（`lang-triton-ascend`）：Triton DSL 落 Ascend，`@triton.jit`/grid/`tl.load|store`/`BLOCK constexpr`，上游实例（#4304 fused_gdn_gating、#4413/#5918 rope、#4595 l2norm 等），含 Triton kernel skeleton snippet。两页互引并对比"何时用哪个"。
+- 按用户要求**只做这两个**，其余 language（pto-as/cce/bang-c/musa/hip 等）暂不做。
+
+**为什么**
+- sources 里 AscendC 与 Triton 两类 kernel 都很多，但缺语言层的落点；补齐后 `queries/by-language.md` 有了对应的综合页可跳转。
+
+**结果 / 现状**
+- `validate.py` = **0 errors**（32 source / **19 wiki** / 51 ids），索引重生。均 `source-reported`；snippet 标注为标准骨架/非逐字上游代码，未臆断 Ascend 上具体支持的 `tl.*` 集合。
+
+---
+
 ### 2026-07-02 — pattern 页开张（+3 页，wiki 达 17 页，by-problem 索引激活）
 
 **做了什么**
@@ -184,7 +199,7 @@
 | 层 | 内容 | 数量 |
 |---|---|---|
 | sources | vllm-ascend PR 页 + 官方文档摘要 | 31 PR + 1 doc |
-| wiki | `hardware/`(4)：cube-unit、ub、mte、vector-unit；`kernels/`(5)：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv；`techniques/`(5)：operator-fusion、host-tiling、double-buffering、ub-alignment、fine-grained-quantization；`patterns/`(3)：memory-bound-layer、fragmented-op-chain、vector-error-after-retile | 17 页 |
+| wiki | `hardware/`(4)：cube-unit、ub、mte、vector-unit；`kernels/`(5)：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv；`techniques/`(5)：operator-fusion、host-tiling、double-buffering、ub-alignment、fine-grained-quantization；`patterns/`(3)：memory-bound-layer、fragmented-op-chain、vector-error-after-retile；`languages/`(2)：ascendc、triton-ascend | 19 页 |
 | candidates | vllm-ascend 账本 | 31 incl / 37 defer / 18 excl |
 | queries | 自动索引 | 6 个（生成物，勿手改） |
 
@@ -196,7 +211,7 @@
    - kernel 页：~~`dispatch_ffn_combine`~~（✅）、~~`mla_preprocess`~~（✅）、~~`transpose_kv_cache_by_block`~~（✅）、~~LoRA bgmv~~（✅）、~~vocabparallel embedding~~（✅）。下一批候选：GmmSwigluQuantWeightNzTensorList（#3804，nz-format 量化）、l2norm/fused_gdn_gating triton（#4595/#4304）、rope triton（#5918）。
    - hardware 页：~~`ub`~~（✅）、~~`mte`~~（✅）、~~`vector-unit`~~（✅），待补 `nz-format / pto-isa / l1-buffer / l0c`。
    - technique 页：~~operator-fusion / host-tiling / double-buffering / ub-alignment / fine-grained-quantization~~（✅ 首批 5 个已建）。待补：`cube-vector-pipeline`、`weight-prefetch`、`mte-overlap`（可与 double-buffering 合并考量）、`data-reuse`。
-   - language 页（尚未开张）：`lang-ascendc`、`lang-triton-ascend`（词表已有，且 sources 里 triton kernel PR 不少，可支撑）。
+   - language 页：~~`lang-ascendc`、`lang-triton-ascend`~~（✅ 用户指定只做这两个；其余暂不做）。
    - pattern 页：~~memory-bound-layer / fragmented-op-chain / vector-error-after-retile~~（✅ 首批 3 个已建）。待补：`low-cube-utilization`、`quantization-accuracy-drop`。
    - 每页带 snippet 级 AscendC/TileLang 代码、靠 `id` 互引 sources、confidence 严格按证据分级。
 2. **gitcode/Gitee 适配器**：CANN 的 `cann-recipes-infer/train` 不在 GitHub，需给 `generate-pr-pages.py` 加 gitcode API 分支。
