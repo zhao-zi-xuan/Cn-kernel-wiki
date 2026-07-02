@@ -23,6 +23,23 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — Triton kernel 页开张（+2，wiki 达 25 页，primer Triton 路径落地）
+
+**做了什么**
+- 词表：`kernel_types` 新增 `sampling`（rejection sampling / penalty 类无合适项，同 `embedding` 处理）。
+- 新增 `kernel-triton-rope`（#4413 partial rope `rope_dim != head_dim`，一个 Triton kernel 取代 2×split+2×rope+2×slice+2×concat；#5918 高性能重写 + 注册/调用修复）。
+- 新增 `kernel-triton-sampling`（#5259 优化 rejection sampling、#5324 归并进 ops/triton、#7569 penalty 的 bincount+apply_penalties）。
+- 互引闭环：`lang-triton-ascend` 回引这两页、正文改为链到 kernel 页而非"看源码"；`references/primer.md` 的 Triton 路径终点从"去看源码"改成两个真实 kernel 页。
+- #4595(l2norm)/#4304(gdn gating) 是归一化/门控，非 rope/sampling，如实留在 triton-ascend 页的"其他 Triton 算子（暂未成页）"，不硬塞。
+
+**为什么**
+- primer 的 Triton 路径此前终点是"去看源码"，缺落点；这两页把 Triton 侧从"只有语言页"补成"语言页 + 实例页"，与 AscendC 侧对称。
+
+**结果 / 现状**
+- `validate.py` = **0 errors**（32 source / **25 wiki** / 57 ids），索引重生；primer 33 个相对链接实测 0 broken。kernel 层 8 → **10**（含 2 个 Triton 实现）。全部 `performance_claims` 定性 `source-reported`（#4413 有 profiling 截图但无数字，其余无数字）。
+
+---
+
 ### 2026-07-02 — 补"入口"：references/primer.md 主题导航地图（知识库首次可被意图检索）
 
 **做了什么**
@@ -233,7 +250,7 @@
 |---|---|---|
 | sources | vllm-ascend PR 页 + 官方文档摘要 | 31 PR + 1 doc |
 | wiki | `hardware/`(4)：cube-unit、ub、mte、vector-unit；`kernels/`(5)：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv；`techniques/`(5)：operator-fusion、host-tiling、double-buffering、ub-alignment、fine-grained-quantization；`patterns/`(3)：memory-bound-layer、fragmented-op-chain、vector-error-after-retile；`languages/`(2)：ascendc、triton-ascend | 23 页 |
-| — kernels 细分 | fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv、grouped-gemm、quantization-gemm、decode-attention | 8 个 |
+| — kernels 细分 | fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv、grouped-gemm、quantization-gemm、decode-attention、triton-rope、triton-sampling | 10 个 |
 | — patterns 细分 | memory-bound-layer、fragmented-op-chain、vector-error-after-retile、quantization-accuracy-drop | 4 个 |
 | candidates | vllm-ascend 账本 | 31 incl / 37 defer / 18 excl |
 | queries | 自动索引 | 6 个（生成物，勿手改） |

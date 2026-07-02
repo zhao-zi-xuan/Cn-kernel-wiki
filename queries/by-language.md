@@ -47,8 +47,10 @@
 - `pr-vllm-ascend-796`
 - `pr-vllm-ascend-814`
 
-## python (27)
+## python (29)
 
+- `kernel-triton-rope`
+- `kernel-triton-sampling`
 - `pr-vllm-ascend-1884`
 - `pr-vllm-ascend-233`
 - `pr-vllm-ascend-3226`
@@ -77,8 +79,10 @@
 - `pr-vllm-ascend-814`
 - `pr-vllm-ascend-8243`
 
-## triton-ascend (12)
+## triton-ascend (14)
 
+- `kernel-triton-rope`
+- `kernel-triton-sampling`
 - `pr-vllm-ascend-4304`
 - `pr-vllm-ascend-4413`
 - `pr-vllm-ascend-4595`

@@ -9,9 +9,10 @@
 - `pr-vllm-ascend-4625`
 - `pr-vllm-ascend-814`
 
-## decode (7)
+## decode (8)
 
 - `kernel-decode-attention`
+- `kernel-triton-sampling`
 - `pr-vllm-ascend-3530`
 - `pr-vllm-ascend-4139`
 - `pr-vllm-ascend-4790`
@@ -104,10 +105,15 @@
 - `pr-vllm-ascend-4606`
 - `pr-vllm-ascend-7779`
 
-## rope (2)
+## rope (3)
 
+- `kernel-triton-rope`
 - `pr-vllm-ascend-4413`
 - `pr-vllm-ascend-5918`
+
+## sampling (1)
+
+- `kernel-triton-sampling`
 
 ## sparse-attention (1)
 

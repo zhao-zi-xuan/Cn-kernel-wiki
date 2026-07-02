@@ -50,7 +50,9 @@
 
 1. [lang-triton-ascend](../wiki/languages/triton-ascend.md) — `@triton.jit` / grid / `tl.load|store` / `BLOCK` autotune
 2. [hw-vector-unit](../wiki/hardware/vector-unit.md) + [hw-ub](../wiki/hardware/ub.md) + [hw-mte](../wiki/hardware/mte.md) — Triton 的 `tl.*` / `tl.load` 映射到的底层单元
-3. 实例源码见 `sources/prs/vllm-ascend/` 里 `ops/triton/*` 的 PR（rope #4413/#5918、l2norm #4595、fused_gdn_gating #4304、reject-sample #5259 等）
+3. [kernel-triton-rope](../wiki/kernels/triton-rope.md) — partial RoPE（`rope_dim != head_dim`）融合，Triton 版算子融合范例
+4. [kernel-triton-sampling](../wiki/kernels/triton-sampling.md) — rejection sampling / penalties，decode 路径的 Triton 部分
+   - 其余 Triton 源码（l2norm #4595、fused_gdn_gating #4304 等）见 `sources/prs/vllm-ascend/`，暂未单独成页
 
 ---
 

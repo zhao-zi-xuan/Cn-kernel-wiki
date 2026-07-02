@@ -79,6 +79,7 @@ kernel_types:
   - decode
   - prefill
   - embedding
+  - sampling
 
 languages:
   - ascendc            # AscendC (C++-like kernel language)

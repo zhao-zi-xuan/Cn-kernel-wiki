@@ -20,6 +20,8 @@ related:
   - lang-ascendc
   - hw-vector-unit
   - hw-ub
+  - kernel-triton-rope
+  - kernel-triton-sampling
 sources:
   - pr-vllm-ascend-4304
   - pr-vllm-ascend-4413
@@ -42,11 +44,13 @@ with `tl.load` / `tl.store` / `tl.*` math and let the compiler handle the device
 Triton-Ascend is the vehicle for a growing set of vllm-ascend ops, especially
 element-wise / normalization / sampling kernels that map well to the block model:
 
-- `fused_gdn_gating` ([#4304](../../sources/prs/vllm-ascend/PR-4304.md))
-- partial **RoPE** ([#4413](../../sources/prs/vllm-ascend/PR-4413.md)) and a later RoPE
-  perf pass ([#5918](../../sources/prs/vllm-ascend/PR-5918.md))
-- **l2norm** ([#4595](../../sources/prs/vllm-ascend/PR-4595.md))
-- reject-sampling and other sampler kernels (see the ledger's Triton include rows)
+- partial **RoPE** ([#4413](../../sources/prs/vllm-ascend/PR-4413.md), [#5918](../../sources/prs/vllm-ascend/PR-5918.md))
+  — see the [Triton RoPE kernel](../kernels/triton-rope.md) page.
+- **sampling** — rejection sampling ([#5259](../../sources/prs/vllm-ascend/PR-5259.md)) and
+  penalties ([#7569](../../sources/prs/vllm-ascend/PR-7569.md)); see the
+  [Triton sampling kernels](../kernels/triton-sampling.md) page.
+- `fused_gdn_gating` ([#4304](../../sources/prs/vllm-ascend/PR-4304.md)) and **l2norm**
+  ([#4595](../../sources/prs/vllm-ascend/PR-4595.md)) — other Triton ops not yet given their own page.
 
 ## Programming model
 
