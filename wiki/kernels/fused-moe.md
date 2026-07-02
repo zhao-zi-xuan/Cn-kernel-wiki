@@ -28,6 +28,11 @@ related:
   - hw-ub
   - hw-mte
   - kernel-mla-preprocess
+  - technique-operator-fusion
+  - technique-host-tiling
+  - technique-double-buffering
+  - technique-ub-alignment
+  - technique-fine-grained-quantization
 sources:
   - doc-ascendc-programming-guide
   - pr-vllm-ascend-3532

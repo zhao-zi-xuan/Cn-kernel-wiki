@@ -23,6 +23,25 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — 第四步：technique 页开张（+5 页，wiki 达 14 页）
+
+**做了什么**
+- 新增 5 个 `wiki/techniques/` 页，把散落在各 kernel/hw 页里的优化概念收敛成独立可引条目：
+  - `technique-operator-fusion` —— 减少 GM 往返的融合动机 + 三个 kernel 实例（#3532/3226/6366）。
+  - `technique-host-tiling` —— host tiling + device kernel 两段式，UB 容量约束、核间分配、路径选择（#6366 full-load/general）。
+  - `technique-double-buffering` —— 深度 2 队列 ping-pong，MTE↔compute overlap，与 tile 大小的权衡。
+  - `technique-ub-alignment` —— 对齐陷阱（#6468 证据），padding 处理，带 `symptoms`。
+  - `technique-fine-grained-quantization` —— W8A8/W4A8 per-group dequant 融入 matmul epilogue（#3532/7779）。
+- 每页带 snippet（schema `reproducibility_minimum: snippet`）、`prerequisites` 指向已存在的 hw 页、互引成网；`kernel-fused-moe` 回引全部 5 个 technique。
+
+**为什么**
+- kernel/hw 页里反复出现的同一批优化手法，需要有权威落点；technique 页让这些概念可被独立检索、被多个 kernel 复用引用，符合三层"综合知识页"的定位。
+
+**结果 / 现状**
+- `validate.py` = **0 errors**（32 source / **14 wiki** / 46 ids），索引重生。全部 `confidence: source-reported`（机制源于官方文档，实例源于 upstream 代码，无编造数字）。
+
+---
+
 ### 2026-07-02 — 第三步续二：+1 硬件页 +3 kernel 页（wiki 达 9 页）
 
 **做了什么**
@@ -148,7 +167,7 @@
 | 层 | 内容 | 数量 |
 |---|---|---|
 | sources | vllm-ascend PR 页 + 官方文档摘要 | 31 PR + 1 doc |
-| wiki | `hardware/`：cube-unit、ub、mte、vector-unit；`kernels/`：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv | 9 页 |
+| wiki | `hardware/`(4)：cube-unit、ub、mte、vector-unit；`kernels/`(5)：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv；`techniques/`(5)：operator-fusion、host-tiling、double-buffering、ub-alignment、fine-grained-quantization | 14 页 |
 | candidates | vllm-ascend 账本 | 31 incl / 37 defer / 18 excl |
 | queries | 自动索引 | 6 个（生成物，勿手改） |
 
@@ -159,7 +178,9 @@
 1. **写 wiki 综合页**（当前重点，素材已充分）：
    - kernel 页：~~`dispatch_ffn_combine`~~（✅）、~~`mla_preprocess`~~（✅）、~~`transpose_kv_cache_by_block`~~（✅）、~~LoRA bgmv~~（✅）、~~vocabparallel embedding~~（✅）。下一批候选：GmmSwigluQuantWeightNzTensorList（#3804，nz-format 量化）、l2norm/fused_gdn_gating triton（#4595/#4304）、rope triton（#5918）。
    - hardware 页：~~`ub`~~（✅）、~~`mte`~~（✅）、~~`vector-unit`~~（✅），待补 `nz-format / pto-isa / l1-buffer / l0c`。
-   - technique 页（尚未开张，建议下一步优先）：`operator-fusion`、`host-tiling`、`double-buffering`、`ub-alignment`、`fine-grained-quantization` —— 这些 tag 已在多页出现，可提炼成独立 technique 页，把散落的概念收敛。
+   - technique 页：~~operator-fusion / host-tiling / double-buffering / ub-alignment / fine-grained-quantization~~（✅ 首批 5 个已建）。待补：`cube-vector-pipeline`、`weight-prefetch`、`mte-overlap`（可与 double-buffering 合并考量）、`data-reuse`。
+   - language 页（尚未开张）：`lang-ascendc`、`lang-triton-ascend`（词表已有，且 sources 里 triton kernel PR 不少，可支撑）。
+   - pattern 页（尚未开张）：如"MoE 访存瓶颈 → 候选 techniques"这类问题导向页。
    - 每页带 snippet 级 AscendC/TileLang 代码、靠 `id` 互引 sources、confidence 严格按证据分级。
 2. **gitcode/Gitee 适配器**：CANN 的 `cann-recipes-infer/train` 不在 GitHub，需给 `generate-pr-pages.py` 加 gitcode API 分支。
 3. **artifacts 溯源**（可选）：拉真实 kernel 代码进 `artifacts/`，每 bundle 一个 `PROVENANCE.yaml`。
