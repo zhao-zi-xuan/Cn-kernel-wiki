@@ -23,6 +23,22 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — 上传到 GitHub（独立仓库，不含个人文件）
+
+**做了什么**
+- 发现本地 wiki 目录嵌在 `E:/` 这个大 git 仓库里（装着个人文件），为避免误传，在 `e:/npu-kernel-wiki` 内**单独 `git init` 一个独立仓库**（`main` 分支）。
+- 加 `.gitignore`（Python 缓存 / 编辑器 / `*.token`、`.env` 等，防止误提交密钥），确认 62 个待提交文件全是 wiki 内容、无父目录个人文件。
+- 首次提交推送到 `https://github.com/zhao-zi-xuan/Cn-kernel-wiki`（默认分支 main）。
+
+**为什么**
+- 给知识库一个可协作、可备份的远端；独立仓库隔离了 `E:/` 上的无关个人数据。
+
+**结果 / 现状**
+- 远端 62 blobs，与本地一致；`origin` 用干净 HTTPS URL（**未把 token 写进 config**）。推送走系统凭据管理器（那个只读 token 无写权限，已 403 拒绝，未使用）。
+- 备注：仓库名是 `Cn-kernel-wiki`（用户自建），与项目内部标题 NPUKernelWiki 略有出入，无碍。
+
+---
+
 ### 2026-07-02 — 第三步续：补两个硬件页 + MLA preprocess kernel 页（wiki 5 页互引成网）
 
 **做了什么**
