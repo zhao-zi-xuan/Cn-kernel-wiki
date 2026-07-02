@@ -17,6 +17,9 @@
 1. **Ascend-first**：昇腾为主，别家仅 interface-level（非昇腾页需 `secondary_vendor_note`）。
 2. **No-hardware**：复现性封顶 `snippet`，性能只能 `source-reported`。validator 强制。
 
+> **这些决策为什么这么定** → 见 [DESIGN.md](DESIGN.md)（两条铁律的理由、为什么 Ascend-first、
+> 为什么不做分布式、为什么两段式摄入）——面向"方法论驱动的知识工程"视角的设计说明。
+
 ## 快速开始
 
 ```bash
