@@ -1,0 +1,251 @@
+## Page-Type Schemas (NPUKernelWiki, Ascend-first)
+## Defines required/optional fields per page type. Consumed by scripts/validate.py.
+##
+## TWO PROJECT-SPECIFIC RULES are baked in (vs. the upstream KernelWiki template):
+##   1. NO HARDWARE  -> reproducibility is capped at `snippet`; every
+##      performance_claims entry must carry source_id + measurement=source-reported.
+##   2. ASCEND-FIRST -> any wiki page targeting a secondary vendor
+##      (cambricon-mlu / moore-musa / hygon-dcu) WITHOUT any ascend-* / davinci
+##      architecture must include a `secondary_vendor_note`.
+
+source-pr:
+  required:
+    - id            # pr-<repo-slug>-<N>
+    - repo          # e.g. vllm-project/vllm-ascend
+    - pr
+    - title
+    - author
+    - date
+    - url
+    - source_category
+    - architectures
+    - tags
+    - techniques
+    - hardware_features
+    - kernel_types
+    - languages
+    - captured_at
+    - status
+  optional:
+    - merge_sha
+    - description
+    - inclusion_reason
+    - changed_paths
+    - artifact_dir
+    - secondary_vendor_note
+  constraints:
+    source_category: upstream-code
+    status: [open, merged, closed]
+    merge_sha_required_when: "status == merged"
+
+source-doc:
+  required:
+    - id
+    - title
+    - url
+    - source_category
+    - architectures
+    - tags
+    - retrieved_at
+  optional:
+    - author
+    - description
+    - lang            # zh / en — Ascend docs are often Chinese
+  constraints:
+    source_category: [official-doc, paper]
+
+source-blog:
+  required:
+    - id
+    - title
+    - author
+    - url
+    - source_category
+    - architectures
+    - tags
+    - retrieved_at
+  optional:
+    - description
+    - lang
+    - artifact_dir
+  constraints:
+    source_category: [benchmark-blog, community-note]
+
+source-contest:
+  required:
+    - id
+    - title
+    - source_category
+    - architectures
+    - tags
+  optional:
+    - url
+    - description
+    - track
+  constraints:
+    source_category: contest-report
+
+wiki-hardware:
+  required:
+    - id            # hw-*
+    - title
+    - type
+    - architectures
+    - tags
+    - confidence
+    - related
+    - sources
+    - aliases
+  optional:
+    - reproducibility
+    - prerequisites
+    - secondary_vendor_note
+    - evidence_basis
+  constraints:
+    type: hardware
+    id_prefix: hw-
+
+wiki-technique:
+  required:
+    - id            # technique-*
+    - title
+    - type
+    - architectures
+    - tags
+    - confidence
+    - reproducibility
+    - prerequisites
+    - related
+    - sources
+  optional:
+    - aliases
+    - symptoms
+    - secondary_vendor_note
+    - evidence_basis
+    - artifact_dir
+  constraints:
+    type: technique
+    id_prefix: technique-
+    reproducibility_minimum: snippet
+
+wiki-pattern:
+  required:
+    - id            # pattern-*
+    - title
+    - type
+    - tags
+    - symptoms
+    - candidate_techniques
+    - related
+    - sources
+  optional:
+    - architectures
+    - confidence
+  constraints:
+    type: pattern
+    id_prefix: pattern-
+
+wiki-kernel:
+  required:
+    - id            # kernel-*
+    - title
+    - type
+    - architectures
+    - tags
+    - confidence
+    - reproducibility
+    - kernel_types
+    - languages
+    - related
+    - sources
+    - performance_claims
+  optional:
+    - aliases
+    - prerequisites
+    - symptoms
+    - secondary_vendor_note
+    - evidence_basis
+    - artifact_dir
+  constraints:
+    type: kernel
+    id_prefix: kernel-
+    reproducibility_minimum: snippet
+
+wiki-language:
+  required:
+    - id            # lang-*
+    - title
+    - type
+    - tags
+    - related
+    - sources
+    - reproducibility
+  optional:
+    - architectures
+    - confidence
+    - aliases
+    - evidence_basis
+    - secondary_vendor_note
+  constraints:
+    type: language
+    id_prefix: lang-
+    reproducibility_minimum: snippet
+
+wiki-migration:
+  required:
+    - id            # migration-*
+    - title
+    - type
+    - from_arch
+    - to_arch
+    - tags
+    - related
+    - sources
+  optional:
+    - confidence
+    - reproducibility
+    - prerequisites
+  constraints:
+    type: migration
+    id_prefix: migration-
+
+## performance_claims (inside wiki-kernel). NO-HARDWARE rule applies.
+performance-claim:
+  required:
+    - chip          # e.g. ascend-910b
+    - dtype
+    - shape
+    - metric
+    - value
+    - source_id
+    - measurement   # MUST be source-reported (no self-benchmarking without hardware)
+  constraints:
+    measurement: [source-reported, official-doc]   # 'self-measured' is forbidden
+
+## PROVENANCE.yaml for artifact bundles under artifacts/
+artifact-bundle-provenance:
+  required:
+    - origin_url
+    - upstream_repo
+    - license
+    - retrieved_at
+    - asset_mode
+    - files
+  optional:
+    - upstream_sha
+    - derived_from
+  constraints:
+    asset_mode: [verbatim, extracted, derived]
+    derived_from_required_when: "asset_mode == derived"
+  files_schema:
+    required:
+      - local_path
+      - role
+      - mode
+      - sha256
+    optional:
+      - upstream_path
+      - heading_path
+    constraints:
+      role: [pr-diff, upstream-file, extracted-block, derived-source, approach-notes]
+      mode: [verbatim, extracted, derived, upstream-patch]

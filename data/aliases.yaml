@@ -1,0 +1,104 @@
+## Canonical Aliases (NPUKernelWiki, Ascend-first)
+## Maps canonical tag -> known aliases, for alias-aware search/normalization.
+## Format: canonical_term: [alias1, alias2, ...]
+
+# --- Hardware features ---
+cube-unit:
+  - Cube
+  - "Cube单元"
+  - matmul-unit
+  - "matrix unit"
+  - AIC-cube
+ub:
+  - UB
+  - "Unified Buffer"
+  - "统一缓冲区"
+  - unified-buffer
+mte:
+  - MTE
+  - "Memory Transfer Engine"
+  - "搬运单元"
+  - DMA
+aic:
+  - "AI Core"
+  - AICore
+aiv:
+  - "AI Vector"
+  - "vector core"
+nz-format:
+  - NZ
+  - nZ
+  - fractal
+  - "分形格式"
+pto-isa:
+  - PTO
+  - "PTO ISA"
+  - PyPTO
+  - "PTO虚拟指令集"
+
+# --- Architectures ---
+ascend-910b:
+  - 910B
+  - "Atlas 800I A2"
+  - "Atlas 800T A2"
+  - A2
+ascend-910c:
+  - 910C
+  - A3
+  - "Atlas 800I A3"
+  - "Atlas A3"
+ascend-310p:
+  - 310P
+  - "Atlas 300I Duo"
+ascend-950:
+  - 950
+  - "Ascend 950"
+davinci:
+  - DaVinci
+  - "达芬奇"
+
+# --- Languages / DSLs ---
+ascendc:
+  - AscendC
+  - "Ascend C"
+  - "昇腾C"
+tilelang-ascend:
+  - "TileLang-Ascend"
+  - "TileLang Ascend"
+triton-ascend:
+  - "Triton-Ascend"
+  - "Triton on Ascend"
+
+# --- Kernel types ---
+moe:
+  - MoE
+  - "mixture of experts"
+  - "Mixture of Experts"
+fused-moe:
+  - "fused MoE"
+  - "DispatchFFNCombine"
+mla:
+  - MLA
+  - "multi-head latent attention"
+sparse-attention:
+  - "Sparse Flash Attention"
+  - "Lightning Indexer"
+  - DSA
+  - "DeepSeek Sparse Attention"
+
+# --- Techniques ---
+operator-fusion:
+  - VF
+  - "Vector Fusion"
+  - AutoFuse
+  - "算子融合"
+host-tiling:
+  - "tiling program"
+  - "host tiling"
+  - "tiling策略"
+cube-vector-pipeline:
+  - "Cube/Vector流水并行"
+  - "cube vector pipeline"
+weight-prefetch:
+  - "权重预取"
+  - "weight prefetch"

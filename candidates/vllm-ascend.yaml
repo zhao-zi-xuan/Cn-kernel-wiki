@@ -1,0 +1,683 @@
+## Candidate ledger — vllm-project/vllm-ascend
+## Stage-1 of the 2-stage ingestion pipeline (ledger -> generate PR pages).
+## Rows below were populated by a GitHub search ("kernel in:title", merged PRs)
+## then auto-classified by inspecting changed files, then editorially tiered:
+##   include = adds a new kernel/op OR substantial kernel perf optimization
+##   defer   = bugfix to an existing kernel (lower doc value) OR version backport
+##             duplicate of an earlier PR (verify before promoting to include)
+##   exclude = CI / docs / tests / build / host-side wiring (no device kernel)
+## Only `include` rows become sources/prs/vllm-ascend/PR-<N>.md pages in stage 2.
+
+repo: vllm-project/vllm-ascend
+searched_at: '2026-06-29'      # cutoff date for this ledger
+search_query: 'repo:vllm-project/vllm-ascend is:pr is:merged kernel in:title'
+keywords_used:
+  - ascendc
+  - 算子              # operator
+  - kernel
+  - fused             # 融合算子
+  - operator
+  - cube
+  - vector
+  - ub                # unified buffer
+  - mte
+  - tiling
+  - moe
+  - attention
+  - flash
+  - mla
+  - kv_cache
+  - rope
+  - rmsnorm
+  - quant             # w8a8 / w4a8
+  - 310p
+  - a3
+
+## Counts
+total_candidates: 86
+included: 31
+excluded: 18
+deferred: 37
+
+## Inclusion rule (kernel-only scope): INCLUDE a PR iff it adds/changes an
+## actual on-device kernel (*.cce / AscendC operator / csrc/kernels/**).
+## EXCLUDE host-side scheduling, model wiring, packaging, docs-only, distributed
+## (HCCL / super-node) PRs. DEFER if unsure / needs source inspection.
+
+prs:
+
+  - number: 233
+    title: "[core] Support custom ascendc kernels in vllm-ascend"
+    date: '2025-04-03'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/kernels/pos_encoding_kernels.cpp
+      - csrc/kernels/types.h
+      - csrc/kernels/utils.h
+      - csrc/ops.h
+      - csrc/torch_binding.cpp
+      - csrc/utils.h
+  - number: 796
+    title: "add custom ascendc kernel vocabparallelembedding"
+    date: '2025-06-12'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/kernels/get_masked_input_and_mask_kernel.cpp
+      - csrc/ops.h
+      - csrc/torch_binding.cpp
+  - number: 814
+    title: "[Performance]: Custom AscendC Kernel of Multi-Step Prepare Input"
+    date: '2025-05-20'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/kernels/advance_step.cpp
+      - csrc/ops.h
+      - csrc/torch_binding.cpp
+  - number: 1884
+    title: "Add  Custom Kernels For LoRA Performance"
+    date: '2025-07-29'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/kernels/bgmv_expand.cpp
+      - csrc/kernels/bgmv_shrink.cpp
+      - csrc/ops.h
+      - csrc/torch_binding.cpp
+  - number: 3226
+    title: "add mla_preprocess kernel"
+    date: '2025-10-11'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/mla_preprocess/op_host/mla_preprocess.h
+      - csrc/mla_preprocess/op_host/tiling/mla_preprocess_tiling.h
+      - csrc/mla_preprocess/op_kernel/kernel/common.h
+      - csrc/mla_preprocess/op_kernel/kernel/common_func.h
+      - csrc/mla_preprocess/op_kernel/kernel/hardware.h
+      - csrc/mla_preprocess/op_kernel/kernel/iterator.h
+  - number: 3530
+    title: "remove redundant params in mla_preprocess kernel"
+    date: '2025-10-21'
+    decision: include
+    reason: "touches a device kernel"
+    files_changed:
+      - csrc/mla_preprocess/op_kernel/mla_preprocess_kernel.cpp
+      - csrc/mla_preprocess/op_kernel/mla_preprocess_mix_bf16.hpp
+      - csrc/mla_preprocess/op_kernel/mla_preprocess_mix_fp16.hpp
+      - csrc/ops.h
+      - csrc/torch_binding.cpp
+      - csrc/torch_binding_meta.cpp
+  - number: 3532
+    title: "add `dispatch_gmm_combine` kernel"
+    date: '2025-12-04'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/dispatch_ffn_combine/op_host/aclnn_dispatch_ffn_combine.cpp
+      - csrc/dispatch_ffn_combine/op_host/aclnn_dispatch_ffn_combine.h
+      - csrc/dispatch_ffn_combine/op_host/dispatch_ffn_combine_def.cpp
+      - csrc/dispatch_ffn_combine/op_host/dispatch_ffn_combine_proto.cpp
+      - csrc/dispatch_ffn_combine/op_host/dispatch_ffn_combine_tiling.cpp
+      - csrc/dispatch_ffn_combine/op_host/error_log.h
+  - number: 3804
+    title: "[Kernel] add custom op GmmSwigluQuantWeightNzTensorList"
+    date: '2025-11-28'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/grouped_matmul_swiglu_quant_weight_nz_tensor_list/op_host/aclnn_grouped_matmul_swiglu_quant_weight_nz_tensor_list.cpp
+      - csrc/grouped_matmul_swiglu_quant_weight_nz_tensor_list/op_host/aclnn_grouped_matmul_swiglu_quant_weight_nz_tensor_list.h
+      - csrc/grouped_matmul_swiglu_quant_weight_nz_tensor_list/op_host/grouped_matmul_swiglu_quant_weight_nz_tensor_list.cpp
+      - csrc/grouped_matmul_swiglu_quant_weight_nz_tensor_list/op_host/grouped_matmul_swiglu_quant_weight_nz_tensor_list.h
+      - csrc/grouped_matmul_swiglu_quant_weight_nz_tensor_list/op_host/grouped_matmul_swiglu_quant_weight_nz_tensor_list_def.cpp
+      - csrc/grouped_matmul_swiglu_quant_weight_nz_tensor_list/op_host/grouped_matmul_swiglu_quant_weight_nz_tensor_list_proto.cpp
+  - number: 4139
+    title: "[Kernel] add custom op DispatchGmmCombineDecode"
+    date: '2025-12-06'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/dispatch_gmm_combine_decode/op_host/aclnn_dispatch_gmm_combine_decode.cpp
+      - csrc/dispatch_gmm_combine_decode/op_host/aclnn_dispatch_gmm_combine_decode.h
+      - csrc/dispatch_gmm_combine_decode/op_host/dispatch_gmm_combine_decode_def.cpp
+      - csrc/dispatch_gmm_combine_decode/op_host/dispatch_gmm_combine_decode_proto.cpp
+      - csrc/dispatch_gmm_combine_decode/op_host/dispatch_gmm_combine_decode_tiling.cpp
+      - csrc/dispatch_gmm_combine_decode/op_kernel/dispatch_gmm_combine_decode.cpp
+  - number: 4194
+    title: "[Kernel] add custom moe ops for prefill"
+    date: '2025-12-08'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/dispatch_layout/op_host/aclnn_dispatch_layout.cpp
+      - csrc/dispatch_layout/op_host/aclnn_dispatch_layout.h
+      - csrc/dispatch_layout/op_host/dispatch_layout.cpp
+      - csrc/dispatch_layout/op_host/dispatch_layout_tiling.cpp
+      - csrc/dispatch_layout/op_kernel/dispatch_layout.cpp
+      - csrc/dispatch_layout/op_kernel/dispatch_layout.h
+  - number: 4304
+    title: "[task] Add fused gdn gating triton kernel"
+    date: '2025-12-22'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - vllm_ascend/ops/triton/fused_gdn_gating.py
+  - number: 4413
+    title: "[Ops][Triton] Add a triton kernel supporting partial rope."
+    date: '2025-12-02'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - vllm_ascend/ops/triton/rope.py
+      - vllm_ascend/ops/triton/triton_utils.py
+  - number: 4595
+    title: "[Kernel] add l2norm triton kernel"
+    date: '2025-12-24'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - vllm_ascend/ops/triton/fla/chunk.py
+      - vllm_ascend/ops/triton/fla/l2norm.py
+  - number: 4606
+    title: "[Kernel] add custom op MatmulAllreduceAddRmsnorm"
+    date: '2025-12-10'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/matmul_allreduce_add_rmsnorm/op_host/aclnn_matmul_allreduce_add_rmsnorm.cpp
+      - csrc/matmul_allreduce_add_rmsnorm/op_host/aclnn_matmul_allreduce_add_rmsnorm.h
+      - csrc/matmul_allreduce_add_rmsnorm/op_host/matmul_allreduce_add_rmsnorm_def.cpp
+      - csrc/matmul_allreduce_add_rmsnorm/op_host/matmul_allreduce_add_rmsnorm_proto.cpp
+      - csrc/matmul_allreduce_add_rmsnorm/op_host/matmul_allreduce_add_rmsnorm_tiling.cpp
+      - csrc/matmul_allreduce_add_rmsnorm/op_host/matmul_allreduce_add_rmsnorm_workspace.h
+  - number: 4625
+    title: "[kernel] add AscendC op: lightning_indexer and sparse_flash_attention"
+    date: '2025-12-03'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/lightning_indexer/op_host/lightning_indexer_def.cpp
+      - csrc/lightning_indexer/op_host/lightning_indexer_proto.cpp
+      - csrc/lightning_indexer/op_host/lightning_indexer_tiling.cpp
+      - csrc/lightning_indexer/op_host/lightning_indexer_tiling.h
+      - csrc/lightning_indexer/op_kernel/lightning_indexer.cpp
+      - csrc/lightning_indexer/op_kernel/lightning_indexer_common.h
+  - number: 4790
+    title: "[kernel] Adapt DispatchGmmCombineDecode operator to parameters of small operators"
+    date: '2025-12-09'
+    decision: include
+    reason: "touches a device kernel"
+    files_changed:
+      - csrc/dispatch_gmm_combine_decode/op_host/dispatch_gmm_combine_decode_tiling.cpp
+      - csrc/dispatch_gmm_combine_decode/op_kernel/dispatch_gmm_combine_decode.h
+      - csrc/dispatch_gmm_combine_decode/op_kernel/dispatch_gmm_combine_decode/epilogue/block/block_epilogue_per_token_dequant_swiglu.h
+      - csrc/dispatch_gmm_combine_decode/op_kernel/dispatch_gmm_combine_decode/gemm/kernel/grouped_matmul_slice_m_per_token_dequant_swiglu_quant_multistage_workspace.h
+  - number: 4810
+    title: "[Kernel] Add moe normal ops"
+    date: '2025-12-10'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/dispatch_gmm_combine_decode/op_kernel/dispatch_gmm_combine_decode_base.h
+      - csrc/dispatch_layout/op_host/aclnn_dispatch_layout.cpp
+      - csrc/dispatch_layout/op_host/aclnn_dispatch_layout.h
+      - csrc/dispatch_layout/op_host/dispatch_layout.cpp
+      - csrc/dispatch_layout/op_host/dispatch_layout_tiling.cpp
+      - csrc/dispatch_layout/op_kernel/dispatch_layout.cpp
+  - number: 5259
+    title: "feat: implement high-performance Triton kernels for rejection sampling: optimization for rejection_random_sample_kernel"
+    date: '2026-01-05'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - vllm_ascend/ops/triton/reject_sample.py
+  - number: 5324
+    title: "[Refactor][Triton] Move reject sample triton kernels into ops/triton"
+    date: '2025-12-29'
+    decision: include
+    reason: "substantial kernel perf optimization"
+    files_changed:
+      - vllm_ascend/ops/triton/reject_sample.py
+  - number: 5356
+    title: "[Feat][Spec] Optimize token index calculation in spec decode with Triton kernel"
+    date: '2026-01-05'
+    decision: include
+    reason: "touches a device kernel"
+    files_changed:
+      - vllm_ascend/ops/triton/spec_decode/__init__.py
+      - vllm_ascend/ops/triton/spec_decode/utils.py
+  - number: 5518
+    title: "[Triton][Config] Add muls_add triton kernel and refactor AscendCompilationConfig"
+    date: '2026-03-02'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - vllm_ascend/ops/triton/muls_add.py
+  - number: 5579
+    title: "[Kernel] Add moe_gating_top_k operator support for Ascend NPU"
+    date: '2026-01-07'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/moe_gating_top_k/op_host/error_log.h
+      - csrc/moe_gating_top_k/op_host/math_util.h
+      - csrc/moe_gating_top_k/op_host/moe_gating_top_k_def.cpp
+      - csrc/moe_gating_top_k/op_host/moe_gating_top_k_infershape.cpp
+      - csrc/moe_gating_top_k/op_host/moe_gating_top_k_proto.cpp
+      - csrc/moe_gating_top_k/op_host/moe_gating_top_k_proto.h
+  - number: 5918
+    title: "[Ascend] perf: optimize rope embedding with triton kernel for huge performance gain"
+    date: '2026-01-21'
+    decision: include
+    reason: "substantial kernel perf optimization"
+    files_changed:
+      - vllm_ascend/ops/triton/rope.py
+  - number: 6366
+    title: "[Kernel] Add AscendC fused op transpose_kv_cache_by_block to speed up GQA transfer"
+    date: '2026-02-03'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/torch_binding.cpp
+      - csrc/torch_binding_meta.cpp
+      - csrc/transpose_kv_cache_by_block/op_host/transpose_kv_cache_by_block_def.cpp
+      - csrc/transpose_kv_cache_by_block/op_host/transpose_kv_cache_by_block_proto.cpp
+      - csrc/transpose_kv_cache_by_block/op_host/transpose_kv_cache_by_block_tiling.cpp
+      - csrc/transpose_kv_cache_by_block/op_host/transpose_kv_cache_by_block_tiling.h
+  - number: 6468
+    title: "[Kernel]: Optimize DispatchFFNCombine performance"
+    date: '2026-02-09'
+    decision: include
+    reason: "substantial kernel perf optimization"
+    files_changed:
+      - csrc/dispatch_ffn_combine/op_host/dispatch_ffn_combine_tiling.cpp
+      - csrc/dispatch_ffn_combine/op_kernel/dispatch_ffn_combine.cpp
+      - csrc/dispatch_ffn_combine/op_kernel/dispatch_ffn_combine.h
+      - csrc/dispatch_ffn_combine/op_kernel/dispatch_ffn_combine_kernel.hpp
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/moe_v2_common.h
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/moe_v2_fullload_dynamic_quant.h
+  - number: 6537
+    title: "perf: adaptive block size selection in linear_persistent kernel"
+    date: '2026-02-04'
+    decision: include
+    reason: "substantial kernel perf optimization"
+    files_changed:
+      - vllm_ascend/ops/triton/batch_invariant/matmul.py
+  - number: 7569
+    title: "[Triton][Sampler] Add penalty-related Triton kernel for better performance of penalties"
+    date: '2026-03-30'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - vllm_ascend/ops/triton/bincount.py
+      - vllm_ascend/ops/triton/penalty.py
+  - number: 7779
+    title: "[Feature][Kernel add] Fuse W4A8 dispatch + FFN + combine into a single fused kernel"
+    date: '2026-04-14'
+    decision: include
+    reason: "adds a new kernel/op"
+    files_changed:
+      - csrc/dispatch_ffn_combine/dispatch_ffn_combine_torch_adpt.h
+      - csrc/dispatch_ffn_combine/op_host/dispatch_ffn_combine_proto.cpp
+      - csrc/dispatch_ffn_combine/op_kernel/dispatch_ffn_combine_kernel.hpp
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/moe_init_routing_quant_v2_tiling.h
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/moe_init_routing_v2_tiling.h
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/tiling_base.h
+  - number: 8083
+    title: "[Performance][model_runner_v2]:optimize for triton op _temperature_kernel and _topk_log_softmax_kernel"
+    date: '2026-04-17'
+    decision: include
+    reason: "tunes Triton kernel compile-config/call-params via monkey-patch (patch_triton.py); affects kernel behavior, NOT compute logic -> wiki page confidence=source-reported"
+    files_changed:
+      - vllm_ascend/patch/worker/patch_v2/patch_triton.py
+  - number: 8243
+    title: "[Performance][model_runner_v2]:optimize the performance of the _min_p_kernel"
+    date: '2026-04-16'
+    decision: include
+    reason: "tunes Triton kernel compile-config/call-params via monkey-patch (patch_triton.py); affects kernel behavior, NOT compute logic -> wiki page confidence=source-reported"
+    files_changed:
+      - vllm_ascend/patch/worker/patch_v2/patch_triton.py
+  - number: 8902
+    title: "[Feature] update dataWithScale and combine in dispatch_ffn_kernel"
+    date: '2026-05-07'
+    decision: include
+    reason: "touches a device kernel"
+    files_changed:
+      - csrc/dispatch_ffn_combine/op_kernel/dispatch_ffn_combine.h
+      - csrc/dispatch_ffn_combine/op_kernel/dispatch_ffn_combine_kernel.hpp
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/moe_v2_fullload_dynamic_quant.h
+      - csrc/dispatch_ffn_combine/op_kernel/moe_init_routing_quant_v2/moe_v2_gather_dynamic_quant.h
+      - csrc/dispatch_ffn_combine/op_kernel/utils/block_epilogue_pertoken_v2.hpp
+  - number: 740
+    title: "[Attention][Kernel]moe support for llama4 and mllama4"
+    date: '2025-05-13'
+    decision: defer
+    reason: "host-side op wiring (no device-kernel file in diff); verify"
+    files_changed: []
+  - number: 987
+    title: "[Kernel] Remove cumsum in groupedmatmul"
+    date: '2025-06-06'
+    decision: defer
+    reason: "host-side op wiring (no device-kernel file in diff); verify"
+    files_changed: []
+  - number: 1916
+    title: "add super kernel in decode moe"
+    date: '2025-07-24'
+    decision: defer
+    reason: "host-side op wiring (no device-kernel file in diff); verify"
+    files_changed: []
+  - number: 2325
+    title: "Add Custom Kernels For LoRA Performance"
+    date: '2025-08-19'
+    decision: defer
+    reason: "version backport / duplicate of #1884"
+    files_changed: []
+  - number: 3485
+    title: "[feat][torchair] support super kernel feat for quantized dsr1"
+    date: '2025-10-20'
+    decision: defer
+    reason: "host-side op wiring (no device-kernel file in diff); verify"
+    files_changed: []
+  - number: 3549
+    title: "[BugFix][mian] Fixed a triton kernel bug of layer_norm_fwd_kernel for Qwen3-next"
+    date: '2025-10-21'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 3693
+    title: "[Main][Perf] Add fused matmul/reduce-scatter kernel for performance optimization."
+    date: '2025-10-24'
+    decision: defer
+    reason: "host-side op wiring (no device-kernel file in diff); verify"
+    files_changed: []
+  - number: 3725
+    title: "[0.11.0][Perf] Add fused matmul/reduce-scatter kernel for performance optimization."
+    date: '2025-10-25'
+    decision: defer
+    reason: "version backport / duplicate of #3693"
+    files_changed: []
+  - number: 5322
+    title: "[FIX] Update _causal_conv1d_update_kernel for Efficient Conv State Handling on NPU"
+    date: '2025-12-26'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 5335
+    title: "[kernel] fix matmul_allreduce_add_rmsnorm_kernel"
+    date: '2026-01-05'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 6464
+    title: "[bugfix][0.13.0]fix bug in dispatch_ffn_combine kernel"
+    date: '2026-02-01'
+    decision: defer
+    reason: "version-branch bugfix [0.13.0]; mainline original not auto-identified — verify on GitHub"
+    files_changed: []
+  - number: 6465
+    title: "[bugfix]fix some bug in dispatch_ffn_combine kernel"
+    date: '2026-02-02'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 6964
+    title: "[Bugfix] Fix the moe_forward error when setting enable_static_kernel …"
+    date: '2026-03-06'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 7221
+    title: "[model_runner_v2]optimize the performance of the _topk_log_softmax_kernel"
+    date: '2026-03-16'
+    decision: defer
+    reason: "full diff shows only tests/build/wiring — no device-kernel source; verify"
+    files_changed: []
+  - number: 7481
+    title: "[kernel] Optimized Triton operator recompilation."
+    date: '2026-03-26'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 7482
+    title: "[Triton][Qwen3.5] delete expr for kernels args"
+    date: '2026-03-25'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 7483
+    title: "[kernel] Recompilation optimization triggered by triton function para…"
+    date: '2026-03-26'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 7575
+    title: "[model_runner_v2]:optimize the performance of the _compute_slot_mappings_kernel"
+    date: '2026-03-24'
+    decision: defer
+    reason: "full diff shows only tests/build/wiring — no device-kernel source; verify"
+    files_changed: []
+  - number: 7645
+    title: "[v0.18.0][kernel] Recompilation optimization triggered by triton function parameter optimization"
+    date: '2026-03-26'
+    decision: defer
+    reason: "version backport / duplicate of #7645"
+    files_changed: []
+  - number: 7646
+    title: "[v0.18.0][Triton][Qwen3.5] delete expr for kernels args"
+    date: '2026-03-25'
+    decision: defer
+    reason: "version backport / duplicate of #7482"
+    files_changed: []
+  - number: 7647
+    title: "[v0.18.0][kernel] Optimized Triton operator recompilation."
+    date: '2026-03-26'
+    decision: defer
+    reason: "version backport / duplicate of #7481"
+    files_changed: []
+  - number: 7757
+    title: "[Performance][model_runner_v2]:optimize the performance of the bincount_kernel"
+    date: '2026-04-09'
+    decision: defer
+    reason: "full diff shows only tests/build/wiring — no device-kernel source; verify"
+    files_changed: []
+  - number: 7767
+    title: "[Performance][model_runner_v2]:optimize the performance of the _ranks_kernel and _min_p_kernel"
+    date: '2026-04-03'
+    decision: defer
+    reason: "full diff shows only tests/build/wiring — no device-kernel source; verify"
+    files_changed: []
+  - number: 7794
+    title: "[releases/v0.18.0][Triton][Sampler] Add penalty-related Triton kernel for better performance of penalties"
+    date: '2026-03-31'
+    decision: defer
+    reason: "version backport / duplicate of #7569"
+    files_changed: []
+  - number: 8030
+    title: "[Performance][model_runner_v2]Add bad-words-kernel triton kernel and optimize performance"
+    date: '2026-04-11'
+    decision: defer
+    reason: "full diff shows only tests/build/wiring — no device-kernel source; verify"
+    files_changed: []
+  - number: 8318
+    title: "[Performance] Converts conv3d to linear when the kernel size is equal to the stride."
+    date: '2026-04-20'
+    decision: defer
+    reason: "host-side op wiring (no device-kernel file in diff); verify"
+    files_changed: []
+  - number: 8405
+    title: "[0.18.0][BugFix] dispatch_ffn_combine kernel rollback combinev2 part"
+    date: '2026-04-18'
+    decision: defer
+    reason: "version-branch bugfix [0.18.0]; mainline original not auto-identified — verify on GitHub"
+    files_changed: []
+  - number: 8531
+    title: "[Bugfix][0.18.0] fix kernels in sample when mask is not static or draft_token_id is invalid"
+    date: '2026-04-23'
+    decision: defer
+    reason: "version-branch bugfix [0.18.0]; mainline original not auto-identified — verify on GitHub"
+    files_changed: []
+  - number: 9096
+    title: "[BugFix]Fix compile error in dispatch_ffn_combine kernel"
+    date: '2026-05-12'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 9849
+    title: "[Ascend950] [BugFix] Fix split_qkv_rmsnorm_rope Triton kernel accuracy issue on A5"
+    date: '2026-06-06'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 10016
+    title: "[Misc][Ops] Fix a bug inside a triton operator  fused_sigmoid_gating_delta_rule_update_kernel"
+    date: '2026-06-10'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 10033
+    title: "[BugFix] chunk_scaled_dot_kkt_fwd_kernel accuracy issues"
+    date: '2026-06-08'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 10138
+    title: "[Bugfix] Fix bincount Triton kernel grid overflow with repetition_penalty"
+    date: '2026-06-09'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 10185
+    title: "[Misc][Ops] Fix a bug inside a triton operator fused_sigmoid_gating_delta_rule_update_kernel"
+    date: '2026-06-10'
+    decision: defer
+    reason: "version backport / duplicate of #10016"
+    files_changed: []
+  - number: 10276
+    title: "[Attention][BugFix] Fix NaN issue in Lightning Attention NPU kernel caused by unmasked padding"
+    date: '2026-06-23'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 10395
+    title: "[Ascend950] [Bugfix] Fix triton kernel performance fluctuation issue for ascend950"
+    date: '2026-06-12'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 10929
+    title: "[Ops][Misc] Remove unused load of b_g in fused_recurrent_gated_delta_rule_fwd_kernel"
+    date: '2026-06-29'
+    decision: defer
+    reason: "bugfix to existing kernel (lower doc value; verify)"
+    files_changed: []
+  - number: 1677
+    title: "[0.9.1][2/N][Feat] Restore paged attention kernel in Full Graph for performence"
+    date: '2025-07-11'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 3397
+    title: "adapt the mla_v1 with the `mla_preprocess` kernel"
+    date: '2025-10-15'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 4550
+    title: "[Kernel] add triton kernels for sampling"
+    date: '2025-12-01'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 4673
+    title: "[BugFix][Triton] Fix ub overflow bug of sample_recover_tokens_kernel"
+    date: '2025-12-05'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 4751
+    title: "[Bugfix] Disable the dispatch_ffn_combine kernel in MTP path"
+    date: '2025-12-09'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 4806
+    title: "Revert \"[Kernel] add custom moe ops for prefill\""
+    date: '2025-12-08'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 4830
+    title: "feat: implement high-performance Triton kernels for rejection sampling"
+    date: '2025-12-18'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 5402
+    title: "[Build] Add installation script of fused_infer_attention_score kernel with flash decoding "
+    date: '2025-12-26'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 5458
+    title: "[Kernel]update csrc cmakelist for open-source cann"
+    date: '2025-12-29'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 5775
+    title: "[Feature]refactor the npugraph_ex config, support online-infer with static kernel"
+    date: '2026-01-20'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 6128
+    title: "[bugfix][npugraph_ex]fix static kernel uninstall issue"
+    date: '2026-01-26'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 6320
+    title: "[e2e Test][npugraph_ex]add static kernel e2e test case"
+    date: '2026-01-30'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 6348
+    title: "[Misc][Test] add e2e test for apply_top_k_top_p_custom kernel"
+    date: '2026-01-28'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 6556
+    title: "[CI] v0.13.0 Make UT does not compile and run custom kernels examples"
+    date: '2026-02-05'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 7019
+    title: "[Bugfix] Obtain kernel block size for computing slot mapping correctly"
+    date: '2026-03-09'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 8085
+    title: "[BugFix][310p]Fix Triton kernel in block_table crash that caused failures"
+    date: '2026-04-09'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []
+  - number: 8882
+    title: "[Doc][Misc] Add static kernel compilation section to graph mode guide"
+    date: '2026-05-06'
+    decision: exclude
+    reason: "ci/doc/test/build/revert by title"
+    files_changed: []
+  - number: 10191
+    title: "[Feature] Auto-compute LOCAL_WORLD_SIZE when static_kernel is enabled"
+    date: '2026-06-17'
+    decision: exclude
+    reason: "no kernel file touched (host/wiring/infra)"
+    files_changed: []

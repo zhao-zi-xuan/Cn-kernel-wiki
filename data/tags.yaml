@@ -1,0 +1,122 @@
+## Controlled Vocabulary — Tags (NPUKernelWiki, Ascend-first)
+## All tags used in source and wiki frontmatter must appear here.
+## The validator (scripts/validate.py) rejects unknown tags.
+##
+## Scope: 昇腾(Ascend) is primary. Secondary vendors (cambricon / moore / hygon)
+## are kept only as "mentioned" architectures and require a `secondary_vendor_note`
+## on any wiki page that targets them WITHOUT an ascend-* architecture.
+
+architectures:
+  # --- Ascend (primary) ---
+  - ascend-910b        # Atlas 800I/800T A2
+  - ascend-910c        # Atlas A3
+  - ascend-310p        # inference / edge
+  - ascend-950         # newest generation
+  - davinci            # generic DaVinci AI Core (arch-agnostic Ascend)
+  # --- secondary vendors (interface-only, require secondary_vendor_note) ---
+  - cambricon-mlu
+  - moore-musa
+  - hygon-dcu
+
+hardware_features:
+  - cube-unit          # matmul/tensor unit (≈ tensor core)
+  - vector-unit        # SIMD vector unit
+  - scalar-unit
+  - ub                 # Unified Buffer (on-core scratchpad)
+  - l1-buffer
+  - l0a                # Cube input buffer A
+  - l0b                # Cube input buffer B
+  - l0c                # Cube accumulator buffer
+  - gm                 # global memory (HBM)
+  - mte                # Memory Transfer Engine (async DMA)
+  - aic                # AI Core (Cube path)
+  - aiv                # AI Vector core
+  - pipe-sync          # inter-pipe (MTE/Cube/Vector) synchronization
+  - event-sync
+  - nz-format          # NZ / fractal data layout
+  - pto-isa            # PTO virtual ISA (cross-gen)
+  - int8
+  - fp16
+  - bf16
+  - fp8
+  - w8a8
+  - w4a8
+
+techniques:
+  - host-tiling            # host-side tiling program
+  - cube-vector-pipeline   # Cube/Vector流水并行
+  - operator-fusion        # VF / AutoFuse style fusion
+  - double-buffering
+  - ub-alignment           # avoid mis-aligned UB access
+  - weight-prefetch
+  - mte-overlap            # overlap DMA with compute
+  - ping-pong-buffer
+  - block-size-tuning      # adaptive tiling block size
+  - kernel-fusion
+  - fine-grained-quantization
+  - software-pipeline
+  - data-reuse
+  - loop-unrolling
+  - chunk-parallelism
+
+kernel_types:
+  - matmul
+  - gemm
+  - gemv
+  - attention
+  - flash-attention
+  - sparse-attention
+  - mla
+  - moe
+  - fused-moe
+  - grouped-gemm
+  - kv-cache
+  - rope
+  - rmsnorm
+  - layernorm
+  - conv1d
+  - quantization
+  - decode
+  - prefill
+
+languages:
+  - ascendc            # AscendC (C++-like kernel language)
+  - tilelang-ascend
+  - triton-ascend
+  - pto-as             # PTO assembly layer
+  - cce                # underlying Cube Computing Engine
+  - python
+  - cpp
+  # --- secondary vendor languages (interface-only) ---
+  - bang-c             # Cambricon
+  - musa               # Moore Threads
+  - hip                # Hygon DCU
+
+confidence:
+  - verified
+  - source-reported
+  - inferred
+  - experimental
+
+reproducibility:
+  - concept
+  - pseudocode
+  - snippet
+  # NOTE: `runnable` / `benchmarked` are intentionally NOT listed.
+  # No hardware is available, so these levels cannot be honestly claimed.
+  # The validator rejects them.
+
+source_categories:
+  - official-doc
+  - upstream-code
+  - paper
+  - benchmark-blog
+  - contest-report
+  - community-note
+
+evidence_types:
+  - official-doc
+  - upstream-code
+  - paper
+  - benchmark
+  - inference
