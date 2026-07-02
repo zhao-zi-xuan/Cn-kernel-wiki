@@ -23,6 +23,22 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-02 — 铺高频 kernel 页（+3 kernel +1 支撑 pattern，wiki 达 23 页）
+
+**做了什么**（按用户指定顺序）
+- `kernel-grouped-gemm`（MoE expert 计算核心）：dispatch_gmm_combine 线 —— #4139(DispatchGmmCombineDecode/A3)、#4790(grouped_matmul_slice + per-token dequant swiglu 融合 epilogue、去掉 GMM1 permute / GMM2 transpose)、#3804(NZ 量化权重 grouped matmul)、#3532。与 fused-moe / quantization-gemm 互引。
+- `kernel-quantization-gemm`（W8A8/W4A8 量化 matmul）：#3532(W8A8)/#7779(W4A8 通算 overlap)/#8902(修回退)；把 fine-grained-quantization technique、memory-bound-layer 与 quantization-accuracy-drop 两个 pattern 串成闭环。
+- `kernel-decode-attention`（decode/attention/mla 高频组合）：#4625(lightning_indexer + sparse_flash_attention，DeepSeek v3.2)、#3226(MLA preprocess)、#6366(GQA KV 转置)串成"预处理 → KV 布局 → 稀疏 flash-attention"decode 路径，与 mla-preprocess / transpose-kv-cache 互引。
+- **额外补 1 页**：`pattern-quantization-accuracy-drop`（用户方案里假设它存在但此前未建）—— 低比特量化掉精度 → 候选 fine-grained-quantization，让 quant-gemm 的引用闭环成立（引用 id 必须存在，否则 validator 报错）。
+
+**为什么**
+- 覆盖 PR 里频率最高的 kernel_type 组合（matmul/gemm、quantization、attention/decode/mla），把知识库从"广度"推向"深度"；grouped-gemm 与 quantization-gemm 是 fused-moe 的两个正交切面，decode-attention 把已有的 mla-preprocess/kv-transpose 收拢成完整路径。
+
+**结果 / 现状**
+- `validate.py` = **0 errors**（32 source / **23 wiki** / 55 ids），索引重生。kernel 层 5 → **8**。全部 `performance_claims` 定性 `source-reported`（源 PR 无绝对数字），芯片按源如实（#4139/#4625→910c，其余 davinci）。
+
+---
+
 ### 2026-07-02 — language 页（只做 2 个：lang-ascendc + lang-triton-ascend，wiki 达 19 页）
 
 **做了什么**
@@ -199,7 +215,9 @@
 | 层 | 内容 | 数量 |
 |---|---|---|
 | sources | vllm-ascend PR 页 + 官方文档摘要 | 31 PR + 1 doc |
-| wiki | `hardware/`(4)：cube-unit、ub、mte、vector-unit；`kernels/`(5)：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv；`techniques/`(5)：operator-fusion、host-tiling、double-buffering、ub-alignment、fine-grained-quantization；`patterns/`(3)：memory-bound-layer、fragmented-op-chain、vector-error-after-retile；`languages/`(2)：ascendc、triton-ascend | 19 页 |
+| wiki | `hardware/`(4)：cube-unit、ub、mte、vector-unit；`kernels/`(5)：fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv；`techniques/`(5)：operator-fusion、host-tiling、double-buffering、ub-alignment、fine-grained-quantization；`patterns/`(3)：memory-bound-layer、fragmented-op-chain、vector-error-after-retile；`languages/`(2)：ascendc、triton-ascend | 23 页 |
+| — kernels 细分 | fused-moe、mla-preprocess、transpose-kv-cache-by-block、vocab-parallel-embedding、lora-bgmv、grouped-gemm、quantization-gemm、decode-attention | 8 个 |
+| — patterns 细分 | memory-bound-layer、fragmented-op-chain、vector-error-after-retile、quantization-accuracy-drop | 4 个 |
 | candidates | vllm-ascend 账本 | 31 incl / 37 defer / 18 excl |
 | queries | 自动索引 | 6 个（生成物，勿手改） |
 

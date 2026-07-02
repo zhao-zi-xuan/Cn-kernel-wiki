@@ -28,6 +28,8 @@ related:
   - hw-ub
   - hw-mte
   - kernel-mla-preprocess
+  - kernel-grouped-gemm
+  - kernel-quantization-gemm
   - technique-operator-fusion
   - technique-host-tiling
   - technique-double-buffering

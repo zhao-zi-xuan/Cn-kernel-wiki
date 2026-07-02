@@ -1,10 +1,13 @@
 # Index: Pages by Language/DSL
 
-## ascendc (12)
+## ascendc (15)
 
+- `kernel-decode-attention`
 - `kernel-fused-moe`
+- `kernel-grouped-gemm`
 - `kernel-lora-bgmv`
 - `kernel-mla-preprocess`
+- `kernel-quantization-gemm`
 - `kernel-transpose-kv-cache-by-block`
 - `kernel-vocab-parallel-embedding`
 - `pr-vllm-ascend-233`
@@ -15,11 +18,14 @@
 - `pr-vllm-ascend-814`
 - `pr-vllm-ascend-8902`
 
-## cpp (23)
+## cpp (26)
 
+- `kernel-decode-attention`
 - `kernel-fused-moe`
+- `kernel-grouped-gemm`
 - `kernel-lora-bgmv`
 - `kernel-mla-preprocess`
+- `kernel-quantization-gemm`
 - `kernel-transpose-kv-cache-by-block`
 - `kernel-vocab-parallel-embedding`
 - `pr-vllm-ascend-1884`
