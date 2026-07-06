@@ -23,6 +23,32 @@
 
 ## 进度日志（倒序，最新在上）
 
+### 2026-07-06 — 纠错：补回被漏掉的真实性能数字（4 页 kernel）
+
+**背景 / 用户指出的问题**
+- 用户拿 PR #1884 的 benchmark 表反问"这难道不是性能数字吗"——是。此前多页写着"no absolute figure disclosed"是**错的**。
+
+**根因（两层，都是系统性的）**
+1. `generate-pr-pages.py` 只存 PR 正文**前 400 字符**，benchmark 常在正文靠后 → 源页丢数据。
+2. 更隐蔽：不少 PR 的 benchmark 是**图片附件**，我之前用**文本正则**判断"无数字"，对图片完全无效 → 误判。
+
+**做了什么（重抓完整正文 + 图片附件扫描后修正）**
+- `kernel-lora-bgmv`（#1884）：补 QWen2.5 7B 单卡 v0.9.2.rc1 的 TTFT/TPOT/throughput 对照（如 256/256/20：TTFT 2219→544ms、tput 90→149；作者summary ~70%）。
+- `kernel-triton-rope`（#5918/#4413）：#5918 RoPE 单op延迟 **57.1μs→9μs（6.34x/84.24%）**；#4413 新 Triton RoPE **~12μs**。
+- `kernel-transpose-kv-cache-by-block`（#6366）：UT on **910C** 布局转置 **7ms→0.24ms**。
+- 对应 4 个源页补 `## Performance (source-reported)` 小节（防再次误读）。全部 `measurement: source-reported`（源自报，非本库实测；芯片除 6366(910C) 外多未指明）。
+
+**仍待核实**
+- `kernel-vocab-parallel-embedding`（#796）有 2 张**截图**，可能含数字但需**肉眼看图**，暂维持"screenshots, no machine-readable figure"措辞并标注待审。
+- 其余页（fused-moe/mla-preprocess/grouped-gemm/quantization-gemm/decode-attention/triton-sampling）经完整正文+图片扫描确认**确实无数字**，"no figure disclosed" 成立。
+
+**教训 / 待办**
+- 关键认知：`source-reported` 允许硬数字——D2 禁的是**自测/编造**，不是禁引用。之前把"源没披露"当默认，错了。
+- 待办：给 `generate-pr-pages.py` 提高正文截断上限或专门抓 benchmark 段；图片型 benchmark 需要人工/多模态介入，脚本抓不到。
+
+**结果**：`validate.py` = **0 errors**（32 source / 25 wiki / 57 ids），索引重生。
+
+
 ### 2026-07-02 — Triton kernel 页开张（+2，wiki 达 25 页，primer Triton 路径落地）
 
 **做了什么**

@@ -26,15 +26,14 @@ sources:
   - pr-vllm-ascend-6366
 evidence_basis: >
   Synthesized from upstream vllm-ascend PR #6366, which adds the
-  csrc/transpose_kv_cache_by_block AscendC operator. The PR describes replacing a
-  three-op sequence with one fused kernel but discloses no absolute numbers, so the
-  performance_claims entry is qualitative and source-reported (D2).
+  csrc/transpose_kv_cache_by_block AscendC operator. The PR body reports a unit-test
+  timing on 910C (source-reported, quoted below — we did not run it).
 performance_claims:
   - chip: ascend-910c
     dtype: fp16
-    shape: "per-layer KV cache blocks (shape not disclosed)"
-    metric: "per-layer KV-cache transpose cost during GQA transfer"
-    value: "source-reported reduction — one fused operator replaces the previous npu_paged_cache_load + transpose + _npu_reshape_and_cache sequence that was invoked per layer (no absolute figure disclosed)"
+    shape: "KV-cache layout transpose, unit test on 910C (shape not disclosed)"
+    metric: "transpose_kv_cache_by_block layout cost (UT)"
+    value: "7 ms -> 0.24 ms in UT on 910C, replacing the npu_paged_cache_load + transpose + _npu_reshape_and_cache sequence (source-reported, PR #6366)"
     source_id: pr-vllm-ascend-6366
     measurement: source-reported
 ---
@@ -80,9 +79,11 @@ for (int blk = 0; blk < numBlocks; ++blk) {
   the host tiling; keep them behaviourally identical.
 - This kernel exists specifically for the **heterogeneous prefill/decode TP** case; a
   homogeneous deployment does not need the transpose.
-- Confidence `source-reported` (upstream code, no benchmark). Distributed KV *transfer*
-  itself (the HCCL side) is out of scope here — this page covers only the on-device
-  transpose kernel.
+- **Reported number** (source-reported, not run by this wiki): PR #6366 reports the
+  layout transpose cost dropping **7 ms → 0.24 ms in a unit test on 910C**. Confidence
+  stays `source-reported` (single upstream source, UT figure, not independently reproduced).
+- Distributed KV *transfer* itself (the HCCL side) is out of scope here — this page covers
+  only the on-device transpose kernel.
 
 ## See also
 

@@ -30,14 +30,21 @@ sources:
 evidence_basis: >
   Synthesized from the two upstream vllm-ascend PRs that add/optimize the Triton RoPE
   kernel (#4413 partial-rope fusion, #5918 high-performance rewrite + registration fixes).
-  #4413 shows profiling screenshots but no machine-readable figure, so the
-  performance_claims entry is qualitative and source-reported (D2).
+  Both report single-op RoPE latency figures in their PR bodies (source-reported, quoted
+  below — we did not run them; chip is not explicitly named).
 performance_claims:
   - chip: davinci
     dtype: fp16
-    shape: "rope_dim != head_dim (partial rope); shape not disclosed"
-    metric: "RoPE op count / latency in the attention pre-path"
-    value: "source-reported — one Triton kernel replaces a 2×split + 2×rope + 2×slice + 2×concat sequence for the rope_dim != head_dim case; PR shows profiling improvement but no machine-readable figure"
+    shape: "single RoPE op latency, GLM4/MoE inference on Ascend NPU; chip not named in source"
+    metric: "RoPE operator single-execution latency"
+    value: "57.1 μs -> 9 μs, author-reported 6.34x / 84.24% latency reduction (source-reported, PR #5918)"
+    source_id: pr-vllm-ascend-5918
+    measurement: source-reported
+  - chip: davinci
+    dtype: fp16
+    shape: "rope_dim != head_dim (partial rope), DS 3.2 piecewise aclgraph; chip not named in source"
+    metric: "RoPE compute time (new Triton kernel)"
+    value: "New Triton RoPE ~12 μs; replaces a 2×split + 2×rope + 2×slice + 2×concat sequence (source-reported, PR #4413; original timing shown via profiling image)"
     source_id: pr-vllm-ascend-4413
     measurement: source-reported
 ---
@@ -93,7 +100,10 @@ def rope_partial_kernel(q_ptr, cos_ptr, sin_ptr, out_ptr,
 - #5918's fixes (fake-impl name matching, torch-ops namespace, missing `self` in cos/sin
   slice) are a reminder that **op registration/invocation** is as error-prone as the
   kernel math for Triton-Ascend custom ops.
-- Confidence `source-reported` (upstream code + profiling screenshots, no citable number).
+- **Reported numbers** (source-reported, not run by this wiki): #5918 reports the single
+  RoPE op latency dropping 57.1 μs → 9 μs (6.34x / 84.24%); #4413 reports the new Triton
+  RoPE at ~12 μs. Chip is not named in either PR. Confidence stays `source-reported`
+  (single upstream source each, no official-doc corroboration).
 
 ## See also
 

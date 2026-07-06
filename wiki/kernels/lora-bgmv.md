@@ -25,15 +25,37 @@ sources:
   - pr-vllm-ascend-1884
 evidence_basis: >
   Synthesized from upstream vllm-ascend PR #1884, which adds the bgmv_shrink and
-  bgmv_expand AscendC kernels for LoRA. The PR states the goal is LoRA performance and
-  adds unit tests, but discloses no absolute numbers, so the performance_claims entry is
-  qualitative and source-reported (D2).
+  bgmv_expand AscendC kernels for LoRA. The PR body reports an end-to-end benchmark
+  (QWen2.5 7B, single card, vllm-ascend v0.9.2.rc1) comparing "no custom operator" vs the
+  bgmv custom operators; the numbers below are quoted from that table (source-reported —
+  we did not run them; chip/dtype are not stated in the table).
 performance_claims:
-  - chip: ascend-910b
+  - chip: davinci
     dtype: fp16
-    shape: "batched per-adapter gather-GEMV (shape not disclosed)"
-    metric: "LoRA apply throughput"
-    value: "source-reported — dedicated bgmv_shrink/bgmv_expand AscendC kernels replace a slower LoRA path (no absolute figure disclosed)"
+    shape: "QWen2.5 7B, single card, in/out 256/256, concurrency 20 (vllm-ascend v0.9.2.rc1); chip not named in source"
+    metric: "TTFT (ms), baseline -> bgmv custom operator"
+    value: "2219 -> 544 ms (source-reported, PR #1884 table)"
+    source_id: pr-vllm-ascend-1884
+    measurement: source-reported
+  - chip: davinci
+    dtype: fp16
+    shape: "QWen2.5 7B, single card, in/out 256/256, concurrency 20 (vllm-ascend v0.9.2.rc1); chip not named in source"
+    metric: "throughput (tokens/s), baseline -> bgmv custom operator"
+    value: "90 -> 149 (source-reported, PR #1884 table)"
+    source_id: pr-vllm-ascend-1884
+    measurement: source-reported
+  - chip: davinci
+    dtype: fp16
+    shape: "QWen2.5 7B, single card, in/out 512/512, concurrency 20 (vllm-ascend v0.9.2.rc1); chip not named in source"
+    metric: "TTFT (ms), baseline -> bgmv custom operator"
+    value: "2758 -> 641 ms (source-reported, PR #1884 table)"
+    source_id: pr-vllm-ascend-1884
+    measurement: source-reported
+  - chip: davinci
+    dtype: fp16
+    shape: "QWen2.5 7B, single card, across the reported input/output/concurrency rows"
+    metric: "TTFT / TPOT / throughput (author summary)"
+    value: "~70% improvement overall (author-reported in PR #1884)"
     source_id: pr-vllm-ascend-1884
     measurement: source-reported
 ---
@@ -82,7 +104,12 @@ for (int req = 0; req < batch; ++req) {
   conventions aligned across both.
 - The perf win is from avoiding a generic dense path for what is a thin, per-request
   gather-GEMV; the gather (adapter indexing) is as important as the matmul.
-- Confidence `source-reported` (upstream code + unit tests, no citable number).
+- **Reported numbers**: PR #1884 includes an end-to-end table (QWen2.5 7B, single card,
+  vllm-ascend v0.9.2.rc1) — e.g. at in/out 256/256, concurrency 20: TTFT 2219→544 ms,
+  TPOT 213→131 ms, throughput 90→149 tok/s; author summarizes ~70% overall. These are
+  **source-reported** (the PR's own end-to-end run), not measured by this wiki, and the
+  table does not name the chip/dtype. Confidence stays `source-reported` (single upstream
+  source, no official-doc corroboration, not independently reproduced).
 
 ## See also
 
